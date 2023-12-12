@@ -1,0 +1,123 @@
+class UCCSignatureExpressReservationSystem:
+    def __init__(self):
+        # Declare Arrays
+        self.firstClassSeats = [[{'reserved': False} for _ in range(4)] for _ in range(27)]
+        self.businessClassSeats = [[{'reserved': False} for _ in range(6)] for _ in range(38)]
+        self.economyClassSeats = [[{'reserved': False} for _ in range(8)] for _ in range(56)]
+        self.reserved_seat_numbers = set()
+
+    # Function to display the reservation menu
+    def display_reservation_menu(self):
+        print("UCC Signature Express Limited")
+        print("<Insert Your Own Tagline>")
+        print("Reservation Options:")
+        print("F. First Class")
+        print("B. Business Class")
+        print("E. Economy Class")
+        print("Q. Quit or Cancel")
+        print("Please select an option:")
+
+    # Function to initialize seat arrays
+    def initialize_seats(self):
+        for x in range(27):
+            for y in range(4):
+                self.firstClassSeats[x][y]['reserved'] = False
+
+        for x in range(38):
+            for y in range(6):
+                self.businessClassSeats[x][y]['reserved'] = False
+
+        for x in range(56):
+            for y in range(8):
+                self.economyClassSeats[x][y]['reserved'] = False
+
+    # Function to make a reservation
+    def make_reservation(self, class_type):
+        while True:
+            self.display_reservation_menu()
+            # Prompt to get user choice
+            choice = input("Enter your choice (F/B/E/Q):")
+
+            if choice.upper() == 'Q':
+                print("Reservation Type:", class_type)
+                print("Total number of seats:", self.get_total_seats(class_type))
+                print("Total number of seats reserved:", self.get_reserved_seats(class_type))
+                break
+            else:
+                if choice.upper() in ['F', 'B', 'E']:
+                    row = int(input("Enter row number:"))
+                    column = int(input("Enter column number (1 for window, 2 for aisle):"))
+
+                    # Catching Errors
+                    if not (1 <= row <= 27 and 1 <= column <= 4):  # Adjust indices based on actual seat dimensions
+                        print("Invalid row or column number. Please choose a valid seat.")
+                        continue
+
+                    total_seats, reserved_seats, seats = self.get_seat_information(class_type)
+
+                    if reserved_seats == total_seats:
+                        print("No more available seats.")
+                        break
+
+                    if seats[row - 1][column - 1]['reserved']:
+                        print("Seat already reserved. Please choose another seat.")
+                    else:
+                        seat_number = self.calculate_seat_number(row, column)
+                        if seat_number in self.reserved_seat_numbers:
+                            print("This seat is already reserved. Please choose another seat.")
+                        else:
+                            print(f"Reserving seat: Row {row}, Column {column}")
+                            seats[row - 1][column - 1]['reserved'] = True
+                            self.reserved_seat_numbers.add(seat_number)
+                            self.update_reserved_seats(class_type)
+                    break
+                else:
+                    print("Invalid choice. Please enter F, B, E, or Q.")
+
+    def get_total_seats(self, class_type):
+        if class_type == "First Class":
+            return 27 * 4
+        elif class_type == "Business Class":
+            return 38 * 6
+        elif class_type == "Economy Class":
+            return 56 * 8
+
+    def get_reserved_seats(self, class_type):
+        if class_type == "First Class":
+            return sum(seat['reserved'] for row in self.firstClassSeats for seat in row)
+        elif class_type == "Business Class":
+            return sum(seat['reserved'] for row in self.businessClassSeats for seat in row)
+        elif class_type == "Economy Class":
+            return sum(seat['reserved'] for row in self.economyClassSeats for seat in row)
+
+    def get_seat_information(self, class_type):
+        if class_type == "First Class":
+            return 27 * 4, self.get_reserved_seats(class_type), self.firstClassSeats
+        elif class_type == "Business Class":
+            return 38 * 6, self.get_reserved_seats(class_type), self.businessClassSeats
+        elif class_type == "Economy Class":
+            return 56 * 8, self.get_reserved_seats(class_type), self.economyClassSeats
+
+    def update_reserved_seats(self, class_type):
+        # Update reserved seats
+        pass
+
+    def calculate_seat_number(self, row, column):
+        # A function to calculate a unique seat number based on row and column
+        return (row - 1) * 10 + column
+
+
+# Create an instance of the reservation system
+reservation_system = UCCSignatureExpressReservationSystem()
+
+# Initialize seats
+reservation_system.initialize_seats()
+
+# Make a reservation in the First Class
+reservation_system.make_reservation("First Class")
+
+# Make a reservation in the Business Class
+reservation_system.make_reservation("Business Class")
+
+# Make a reservation in the Economy Class
+reservation_system.make_reservation("Economy Class")
